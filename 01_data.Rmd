@@ -1,0 +1,106 @@
+# Downloading Data
+
+The first step in the project is obtaining the data that we will analyze, as well as processing it so it is in the format we need for further study. 
+
+## Downloading through recount 3 
+
+[`recount3`](http://rna.recount.bio) is a project that provides access to over 750,000 publicly available human and mouse RNA-seq samples, all uniformly processed. The original documentation can be found [here](http://rna.recount.bio/docs/index.html). 
+
+For this project, we will be working with BRCA data from The Cancer Genome Atlas Program ([TCGA](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga)). We will begin by loading the `recount3` package and its dependencies. 
+
+```{r "start", message=FALSE}
+## Load recount3 R package
+library("recount3")
+```
+
+The data available in the `recount3` project can be explored [here](https://jhubiostatistics.shinyapps.io/recount3-study-explorer/). To download the data we are interested in, we will use the following code. 
+
+```{r "download", message=FALSE}
+# Create RangedSummarizedExperiment (RSE) object
+rse_BRCA <- recount3::create_rse_manual(
+              project = "BRCA",
+              project_home = "data_sources/tcga",
+              organism = "human",
+              annotation = "gencode_v29",
+              type = "gene"
+          )
+
+rse_BRCA
+```
+
+This data set includes 63856 genes, and 1256 samples. 
+
+## Obtaining read counts
+
+The `RSE` object contains the raw base-pair counts, to compute the read counts, we use the following code. 
+
+```{r "read counts"}
+# Saving read counts as an assay in the rse object
+assay(rse_BRCA, "counts") <- compute_read_counts(rse_BRCA)
+```
+
+## Exploring data 
+
+Our data is stored as a `RangedSummarizedExperiment` object, which includes data for both the samples (columns), and the genes (rows), as well as metadata and the assays (counts, in this case). We will first perform quality control, and then select some sample attributes for our model. 
+
+```{r}
+# Number of samples and number of sample attributes 
+dim(colData(rse_BRCA))
+```
+
+For our 1256 samples, there are 937 columns, corresponding to 937 possible attributes to include in our model. To reduce the options, we will first filter by removing those attributes with only NA values. 
+
+```{r}
+# Keep only non-empty columns
+colData(rse_BRCA) <- colData(rse_BRCA)[, colSums(is.na(colData(rse_BRCA))) != nrow(colData(rse_BRCA))]
+
+dim(colData(rse_BRCA))
+```
+
+This leaves us with 388 columns. These attributes have terms separated by periods, we can explore the source of each attribute by selecting the first keyword of each one to see what kind of information we have. 
+
+```{r}
+# Split each string by '.'
+split_col_names <- strsplit(colnames(colData(rse_BRCA)), ".", fixed=TRUE)
+
+# Keep only first element 
+split_col_names <- sapply(split_col_names, getElement, 1)
+
+# Counting the results
+table(split_col_names)
+```
+
+Our main sources of information are from `recount` and from `tcga`. 
+
+## Quality control
+
+Let's look at both `recount_qc` and `recount_seq_qc` for quality control. The meaning of the different fields can be found in the [documentation](http://rna.recount.bio/docs/quality-check-fields.html). 
+
+```{r}
+colnames(colData(rse_BRCA))[grepl('^recount_seq_qc', colnames(colData(rse_BRCA)))]
+head(colnames(colData(rse_BRCA))[grepl('^recount_qc', colnames(colData(rse_BRCA)))], 10)
+```
+ 
+
+```{r}
+# The field `recount_seq_qc.avgq` corresponds to the weighted average over Phred quality scores
+summary(rse_BRCA$recount_seq_qc.avgq)
+```
+
+All Phred scores are above 20, meaning all samples are estimated to be at least 99% accurate. 
+
+```{r}
+# Exploring unmapped reads 
+summary(rse_BRCA$'recount_qc.star.%_of_reads_unmapped:_other')
+summary(rse_BRCA$'recount_qc.star.%_of_reads_unmapped:_too_many_mismatches')
+summary(rse_BRCA$'recount_qc.star.%_of_reads_unmapped:_too_short')
+```
+
+There are few unmapped reads, except for some that are too short. 
+
+```{r}
+# Exploring mismatch rate
+summary(rse_BRCA$'recount_qc.star.mismatch_rate_per_base,_%')
+```
+
+Very small percentage of mismatches per base. Overall, it seems that the samples are good quality, and we will proceed with the selection of attributes for our model. 

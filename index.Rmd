@@ -1,0 +1,48 @@
+---
+title: "Differential Expression Analysis of BRCA samples"
+author: "Cristina Sotomayor Vivas"
+site: bookdown::bookdown_site
+github-repo: "CrisSotomayor/rnaseq_project_LCG-UNAM_2022"
+documentclass: book
+output:
+  bookdown::gitbook:
+    css: "style.css"
+    
+---
+
+# Overview {-}
+
+This document contains the final project for the "Introduction to RNA-Seq" module, part of the Bioinformatics and Statistics II class given at LCG-UNAM in February 2022. The original class material from [Dr. Leonardo Collado-Torres](http://lcolladotor.github.io/) can be found [here](https://lcolladotor.github.io/rnaseq_LCG-UNAM_2022/index.html). 
+
+In this project, we will use the [`recount3`](http://rna.recount.bio) R package to download RNA-Seq data from The Cancer Genome Atlas project, obtaining all the BRCA samples. We will then evaluate the quality of the downloaded data, explore the available sample attributes, select a subset of these to build a statistical model, and perform differential expression analysis. 
+
+## Requirements {-}
+
+The following libraries are used in this analysis. 
+
+```{r session_packages, eval = TRUE, message = FALSE}
+library("sessioninfo")
+
+# To download data and generate RangedSummarizedExperiment data object  
+library("recount3")
+
+# To access data on tumor subtype 
+library("TCGAbiolinks")
+
+# To normalize counts
+library("edgeR") 
+
+# To plot results 
+library("ggplot2")
+library("pheatmap")
+
+# For differential expression analysis
+library("limma")
+```
+
+```{r session_info}
+## Reproducibility information
+options(width = 120)
+session_info()
+proc.time()
+```

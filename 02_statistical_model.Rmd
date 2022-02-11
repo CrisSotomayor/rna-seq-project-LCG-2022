@@ -1,0 +1,203 @@
+# Building a statistical model 
+
+## Exploring attributes 
+
+We previously saw that our main sources of information are from `recount` quality control and from `tcga`. For the model, we will look at information from `tcga`. 
+
+```{r}
+head(colnames(colData(rse_BRCA))[grepl('^tcga', colnames(colData(rse_BRCA)))], 10)
+```
+
+Looking through the full list, some possible columns to select for our analysis are the following:
+
+- "tcga.gdc_cases.diagnoses.classification_of_tumor"    
+- "tcga.gdc_cases.diagnoses.primary_diagnosis" 
+- "tcga.gdc_cases.diagnoses.tumor_stage"
+- "tcga.gdc_cases.diagnoses.age_at_diagnosis"
+- "tcga.cgc_case_age_at_diagnosis" 
+- "tcga.xml_histological_type"      
+- "tcga.xml_distant_metastasis_present_ind2" 
+
+We can check each one to see what kind of information they contain, and select the most useful ones. 
+
+```{r}
+# Essentially empty, either not reported or NA
+table(rse_BRCA$tcga.gdc_cases.diagnoses.classification_of_tumor)
+```
+
+```{r}
+# Not very useful, as most samples have the same value 
+# c50.9 = Malignant neoplasm: Breast, unspecified
+table(rse_BRCA$tcga.gdc_cases.diagnoses.primary_diagnosis)
+```
+
+```{r}
+# Useful information, it appears most samples have it and we have different levels 
+table(rse_BRCA$tcga.gdc_cases.diagnoses.tumor_stage)
+```
+
+```{r}
+# Two very similar columns 
+# It appears the first is in days, the second in years, we will use the second one
+head(rse_BRCA$tcga.gdc_cases.diagnoses.age_at_diagnosis)
+head(rse_BRCA$tcga.cgc_case_age_at_diagnosis)
+```
+
+```{r}
+# Different categories, it appears all samples have data 
+table(rse_BRCA$tcga.xml_histological_type)
+```
+
+```{r}
+# Useful information, but not all samples have data 
+table(rse_BRCA$tcga.xml_distant_metastasis_present_ind2)
+```
+
+From this, we select "tcga.gdc_cases.diagnoses.tumor_stage" and "tcga.cgc_case_age_at_diagnosis". For this particular analysis, instead of using the histological type, we are interested in the [PAM50 subtype](https://doi.org/10.1038/nature11412), which we will add to the data later. For the tumor stage, we will reduce the number of levels by ignoring the sub-stage, as well as stage X (undetermined stage), keeping only stage I, stage II, stage III and stage IV.
+
+```{r}
+# Remove a, b, c termination, store in new col 
+rse_BRCA$tumor_stage <- gsub('[abc]$', '', rse_BRCA$tcga.gdc_cases.diagnoses.tumor_stage)
+
+# Replace stage x  and not reported with NA 
+rse_BRCA$tumor_stage <- gsub('stage x|not reported', NA, rse_BRCA$tumor_stage)
+
+# Store data as numbers, as stage I is least advanced, stage IV most advanced
+rse_BRCA$tumor_stage <- gsub('stage iv', 4, rse_BRCA$tumor_stage)
+rse_BRCA$tumor_stage <- gsub('stage iii', 3, rse_BRCA$tumor_stage)
+rse_BRCA$tumor_stage <- gsub('stage ii', 2, rse_BRCA$tumor_stage)
+rse_BRCA$tumor_stage <- gsub('stage i', 1, rse_BRCA$tumor_stage)
+
+table(rse_BRCA$tumor_stage)
+```
+```{r}
+# Store age in new column for easier selection
+rse_BRCA$age <- rse_BRCA$tcga.cgc_case_age_at_diagnosis
+```
+
+
+To obtain the PAM50 subtypes, we will need the package [`TCGAbiolinks`](http://bioconductor.org/packages/release/bioc/html/TCGAbiolinks.html). The function `TCGAquery_subtype` allows us to retrieve molecular subtype data. The documentation can be found [here](https://www.bioconductor.org/packages/devel/bioc/vignettes/TCGAbiolinks/inst/doc/subtypes.html#TCGAquery_subtype:_Working_with_molecular_subtypes_data). 
+
+```{r}
+library("TCGAbiolinks")
+
+# We will store patient and subtype
+subtypes <- TCGAquery_subtype(tumor = "brca")[, c("patient", "BRCA_Subtype_PAM50")]
+subtypes <- as.data.frame(subtypes)
+
+nrow(subtypes)
+```
+
+We have information for 1087 of the 1256 samples. Now, we need to match this information to our table. 
+
+```{r}
+head(subtypes$patient)
+head(rse_BRCA$tcga.tcga_barcode)
+```
+
+We will take the first 12 characters of the `tcga_barcode` and use them to match the subtype. TCGA barcodes contain data about each sample, as explained [here](https://docs.gdc.cancer.gov/Encyclopedia/pages/TCGA_Barcode/). 
+
+<img src="https://docs.gdc.cancer.gov/Encyclopedia/pages/images/barcode.png">
+
+The digits following the initial 12 detail whether a sample comes from a tumor or from normal tissue. There are no duplicates for patient in the `subtypes` table we obtained, so this will only matter if there are both normal and tumor samples for the same patient in our `rse_BRCA` object, in which case, both will get marked as the type of tumor. 
+
+```{r}
+barcode_trimmed <- sapply(rse_BRCA$tcga.tcga_barcode, substr, 1,12, USE.NAMES = FALSE)
+
+# Add as new column
+rse_BRCA$subtype <- subtypes$BRCA_Subtype_PAM50[match(barcode_trimmed, subtypes$patient)]
+
+# Fix normal samples mismatched 
+# Normal samples have the 14th digit of tcga_barcode = 1
+rse_BRCA$subtype[substr(rse_BRCA$tcga.tcga_barcode, 14, 14) == 1] <- "Normal"
+
+# Tumor samples have 14th digit = 0, if one is "Normal", something went wrong, we can ignore those samples 
+rse_BRCA$subtype[(substr(rse_BRCA$tcga.tcga_barcode, 14, 14) == 0)&(rse_BRCA$subtype == "Normal")] <- NA
+```
+
+Now, we will make a statistical model based on these attributes. Before that, we process our desired data one more time, ensuring data types are correct and no NA values remain. 
+
+```{r}
+# Change type of columns of interest, numeric or factor 
+rse_BRCA$subtype <- factor(rse_BRCA$subtype)
+rse_BRCA$age <- as.numeric(rse_BRCA$age)
+rse_BRCA$tumor_stage <- as.numeric(rse_BRCA$tumor_stage)
+
+# Samples
+ncol(rse_BRCA)
+
+# Only keep samples with no NA values in desired cols 
+rse_BRCA <- rse_BRCA[,rowSums(is.na(colData(rse_BRCA)[c('subtype', 'age', 'tumor_stage')])) == 0]
+
+ncol(rse_BRCA)
+```
+
+We are left with 1159 samples. We can obtain a summary of the data: 
+
+```{r}
+summary(as.data.frame(colData(rse_BRCA)[c('subtype', 'age', 'tumor_stage')]))
+```
+
+## Normalizing data
+
+We will use the package [`edgeR`](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25#Sec2) to normalize the data, correcting for _composition bias_. 
+
+```{r, "normalizing"}
+library("edgeR") 
+
+dge <- DGEList(
+    counts = assay(rse_BRCA, "counts"),
+    genes = rowData(rse_BRCA)
+)
+
+dge <- calcNormFactors(dge)
+```
+
+## Exploring relationships between variables 
+
+Considering our three variables, we can explore the relationships between them before proceeding with the model. 
+
+```{r}
+# Plotting 
+library("ggplot2")
+
+# Age vs subtype
+ggplot(as.data.frame(colData(rse_BRCA)), aes(y = age, x = subtype)) +
+     geom_boxplot() +
+     theme_bw(base_size = 20) +
+     ylab("Age") +
+     xlab("Subtype")
+```
+
+There are only slight differences between the age at diagnosis and the subtype. 
+
+```{r}
+# Stage vs subtype 
+table(colData(rse_BRCA)[c('subtype', 'tumor_stage')])
+```
+
+Stage II is the most common. For these plots, we have to keep in mind that normal samples are paired with cancer samples, the stage and age of diagnosis corresponds to the tumor associated. 
+
+```{r}
+# Stage vs age
+ggplot(as.data.frame(colData(rse_BRCA)), aes(y = age, x = factor(tumor_stage))) +
+           geom_boxplot() +
+           theme_bw(base_size = 20) +
+           ylab("Age") +
+           xlab("Tumor Stage")
+```
+
+From these plots, it appears that age is not correlated with a particular subtype or stage: the distribution of age is similar across all four stages and all subtypes. 
+
+We will proceed with the following statistical model:
+
+```{r}
+# Change reference so Normal is the intercept in the model
+rse_BRCA$subtype <- relevel(rse_BRCA$subtype, "Normal")
+
+mod <- model.matrix(~ age + subtype + tumor_stage,
+    data = colData(rse_BRCA)
+)
+colnames(mod)
+```
+

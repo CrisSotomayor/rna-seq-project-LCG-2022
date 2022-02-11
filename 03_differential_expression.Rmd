@@ -1,0 +1,135 @@
+# Differential expression analysis 
+
+Having defined our statistical model, we will proceed with the differential expression analysis, using the `limma` package. The `voom` function transforms count data to log2-counts per million. From this, the mean-variance relationship is used to compute observation level weights. 
+
+```{r}
+library("limma")
+
+vGene <- voom(dge, mod, plot = TRUE)
+```
+
+Our next step is calculating different statistics, to evaluate which genes are differentially expressed in different circumstances. For this, we will use the `eBayes` function. Looking back at what each coefficient represents:
+
+```{r}
+colnames(mod)
+```
+
+We will look at the genes differentially expressed with respect to coefficients 3 (Basal), 4 (Her2), 5 (LumA) and 6 (LumB), to look at the genes associated with the different subtypes. We can predict that these genes are among the ones used to distinguish the subtypes. 
+
+```{r}
+# Empirical Bayes Statistics for Differential Expression
+eb_results <- eBayes(lmFit(vGene))
+```
+
+## Normal tissue  
+
+```{r}
+de_results_normal <- topTable(
+    eb_results,
+    coef = 1,
+    number = nrow(rse_BRCA),
+    sort.by = "none"
+)
+
+# Number of differentially expressed genes
+table(de_results_normal$adj.P.Val < 0.05)
+```
+When compared to cancer, most genes are differentially expressed. 
+
+## Basal subtype
+
+```{r}
+de_results_basal <- topTable(
+    eb_results,
+    coef = 3,
+    number = nrow(rse_BRCA),
+    sort.by = "none"
+)
+
+# Number of differentially expressed genes
+table(de_results_basal$adj.P.Val < 0.05)
+```
+65% of genes are differentially expressed. 
+
+```{r}
+# Visualizing as volcano plot
+volcanoplot(eb_results, coef = 3, highlight = 3, names = de_results_basal$gene_name)
+```
+```{r}
+# Highlighted genes 
+de_results_basal$gene_name[rank(de_results_basal$adj.P.Val) < 4]
+```
+
+## Her2 subtype
+
+```{r}
+de_results_her2 <- topTable(
+    eb_results,
+    coef = 4,
+    number = nrow(rse_BRCA),
+    sort.by = "none"
+)
+
+# Number of differentially expressed genes
+table(de_results_her2$adj.P.Val < 0.05)
+```
+60% of genes are differentially expressed. 
+
+```{r}
+# Visualizing as volcano plot
+volcanoplot(eb_results, coef = 4, highlight = 3, names = de_results_her2$gene_name)
+```
+```{r}
+# Highlighted genes 
+de_results_her2$gene_name[rank(de_results_her2$adj.P.Val) < 4]
+```
+## LumA subtype
+
+```{r}
+de_results_luma <- topTable(
+    eb_results,
+    coef = 5,
+    number = nrow(rse_BRCA),
+    sort.by = "none"
+)
+
+# Number of differentially expressed genes
+table(de_results_luma$adj.P.Val < 0.05)
+```
+47% of genes are differentially expressed. 
+
+```{r}
+# Visualizing as volcano plot
+volcanoplot(eb_results, coef = 5, highlight = 3, names = de_results_luma$gene_name)
+```
+
+```{r}
+# Highlighted genes 
+de_results_luma$gene_name[rank(de_results_luma$adj.P.Val) < 4]
+```
+
+## LumB subtype
+
+```{r}
+de_results_lumb <- topTable(
+    eb_results,
+    coef = 6,
+    number = nrow(rse_BRCA),
+    sort.by = "none"
+)
+
+# Number of differentially expressed genes
+table(de_results_lumb$adj.P.Val < 0.05)
+```
+63% of genes are differentially expressed. 
+
+```{r}
+# Visualizing as volcano plot
+volcanoplot(eb_results, coef = 6, highlight = 3, names = de_results_lumb$gene_name)
+```
+
+
+```{r}
+# Highlighted genes 
+de_results_lumb$gene_name[rank(de_results_lumb$adj.P.Val) < 4]
+```
