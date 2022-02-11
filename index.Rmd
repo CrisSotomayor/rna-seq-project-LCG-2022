@@ -16,9 +16,40 @@ This document contains the final project for the "Introduction to RNA-Seq" modul
 
 In this project, we will use the [`recount3`](http://rna.recount.bio) R package to download RNA-Seq data from The Cancer Genome Atlas project, obtaining all the BRCA samples. We will then evaluate the quality of the downloaded data, explore the available sample attributes, select a subset of these to build a statistical model, and perform differential expression analysis. 
 
+![heatmap_brca_subtype](heatmap.png).
+
 ## Requirements {-}
 
-The following libraries are used in this analysis. 
+Install R 4.1.x from [CRAN](https://cran.r-project.org/) then install the following R packages:
+
+```{r install, eval = FALSE}
+## For installing Bioconductor packages
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager")
+}
+## Install required packages
+BiocManager::install(
+    c(
+        "usethis", ## Utilities
+        "here",
+        "biocthis",
+        "lobstr",
+        "sessioninfo",
+        "SummarizedExperiment", ## Main containers / vis
+        "iSEE",
+        "edgeR", ## RNA-seq
+        "limma",
+        "recount3",
+        "pheatmap", ## Visualization
+        "ggplot2",
+        "patchwork",
+        "RColorBrewer", 
+        "TCGAbiolinks"
+    )
+)
+```
+
+
 
 ```{r session_packages, eval = TRUE, message = FALSE}
 library("sessioninfo")
