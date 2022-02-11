@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>2 Building a statistical model | Differential Expression Analysis of BRCA samples</title>
+  <meta name="description" content="2 Building a statistical model | Differential Expression Analysis of BRCA samples" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="2 Building a statistical model | Differential Expression Analysis of BRCA samples" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="CrisSotomayor/rnaseq_project_LCG-UNAM_2022" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2 Building a statistical model | Differential Expression Analysis of BRCA samples" />
+  
+  
+  
+
+<meta name="author" content="Cristina Sotomayor Vivas" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="downloading-data.html"/>
+<link rel="next" href="differential-expression-analysis.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Overview</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#requirements"><i class="fa fa-check"></i>Requirements</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="downloading-data.html"><a href="downloading-data.html"><i class="fa fa-check"></i><b>1</b> Downloading Data</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="downloading-data.html"><a href="downloading-data.html#downloading-through-recount-3"><i class="fa fa-check"></i><b>1.1</b> Downloading through recount 3</a></li>
+<li class="chapter" data-level="1.2" data-path="downloading-data.html"><a href="downloading-data.html#obtaining-read-counts"><i class="fa fa-check"></i><b>1.2</b> Obtaining read counts</a></li>
+<li class="chapter" data-level="1.3" data-path="downloading-data.html"><a href="downloading-data.html#exploring-data"><i class="fa fa-check"></i><b>1.3</b> Exploring data</a></li>
+<li class="chapter" data-level="1.4" data-path="downloading-data.html"><a href="downloading-data.html#quality-control"><i class="fa fa-check"></i><b>1.4</b> Quality control</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="building-a-statistical-model.html"><a href="building-a-statistical-model.html"><i class="fa fa-check"></i><b>2</b> Building a statistical model</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="building-a-statistical-model.html"><a href="building-a-statistical-model.html#exploring-attributes"><i class="fa fa-check"></i><b>2.1</b> Exploring attributes</a></li>
+<li class="chapter" data-level="2.2" data-path="building-a-statistical-model.html"><a href="building-a-statistical-model.html#normalizing-data"><i class="fa fa-check"></i><b>2.2</b> Normalizing data</a></li>
+<li class="chapter" data-level="2.3" data-path="building-a-statistical-model.html"><a href="building-a-statistical-model.html#exploring-relationships-between-variables"><i class="fa fa-check"></i><b>2.3</b> Exploring relationships between variables</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="differential-expression-analysis.html"><a href="differential-expression-analysis.html"><i class="fa fa-check"></i><b>3</b> Differential expression analysis</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="differential-expression-analysis.html"><a href="differential-expression-analysis.html#normal-tissue"><i class="fa fa-check"></i><b>3.1</b> Normal tissue</a></li>
+<li class="chapter" data-level="3.2" data-path="differential-expression-analysis.html"><a href="differential-expression-analysis.html#basal-subtype"><i class="fa fa-check"></i><b>3.2</b> Basal subtype</a></li>
+<li class="chapter" data-level="3.3" data-path="differential-expression-analysis.html"><a href="differential-expression-analysis.html#her2-subtype"><i class="fa fa-check"></i><b>3.3</b> Her2 subtype</a></li>
+<li class="chapter" data-level="3.4" data-path="differential-expression-analysis.html"><a href="differential-expression-analysis.html#luma-subtype"><i class="fa fa-check"></i><b>3.4</b> LumA subtype</a></li>
+<li class="chapter" data-level="3.5" data-path="differential-expression-analysis.html"><a href="differential-expression-analysis.html#lumb-subtype"><i class="fa fa-check"></i><b>3.5</b> LumB subtype</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="analysis.html"><a href="analysis.html"><i class="fa fa-check"></i><b>4</b> Analysis</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="analysis.html"><a href="analysis.html#differential-expression-by-chromosome"><i class="fa fa-check"></i><b>4.1</b> Differential Expression by Chromosome</a></li>
+<li class="chapter" data-level="4.2" data-path="analysis.html"><a href="analysis.html#basal-tumors"><i class="fa fa-check"></i><b>4.2</b> Basal tumors</a></li>
+<li class="chapter" data-level="4.3" data-path="analysis.html"><a href="analysis.html#her2-tumors"><i class="fa fa-check"></i><b>4.3</b> Her2 tumors</a></li>
+<li class="chapter" data-level="4.4" data-path="analysis.html"><a href="analysis.html#luma-tumors"><i class="fa fa-check"></i><b>4.4</b> LumA tumors</a></li>
+<li class="chapter" data-level="4.5" data-path="analysis.html"><a href="analysis.html#lumb-tumors"><i class="fa fa-check"></i><b>4.5</b> LumB tumors</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Differential Expression Analysis of BRCA samples</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="building-a-statistical-model" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Building a statistical model</h1>
+<div id="exploring-attributes" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Exploring attributes</h2>
+<p>We previously saw that our main sources of information are from <code>recount</code> quality control and from <code>tcga</code>. For the model, we will look at information from <code>tcga</code>.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="building-a-statistical-model.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">colnames</span>(<span class="fu">colData</span>(rse_BRCA))[<span class="fu">grepl</span>(<span class="st">&#39;^tcga&#39;</span>, <span class="fu">colnames</span>(<span class="fu">colData</span>(rse_BRCA)))], <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##  [1] &quot;tcga.tcga_barcode&quot;                   &quot;tcga.gdc_file_id&quot;                    &quot;tcga.gdc_cases.project.name&quot;        
+##  [4] &quot;tcga.gdc_cases.project.released&quot;     &quot;tcga.gdc_cases.project.state&quot;        &quot;tcga.gdc_cases.project.primary_site&quot;
+##  [7] &quot;tcga.gdc_cases.project.project_id&quot;   &quot;tcga.cgc_sample_sample_type&quot;         &quot;tcga.gdc_cases.case_id&quot;             
+## [10] &quot;tcga.gdc_updated_datetime&quot;</code></pre>
+<p>Looking through the full list, some possible columns to select for our analysis are the following:</p>
+<ul>
+<li>“tcga.gdc_cases.diagnoses.classification_of_tumor”<br />
+</li>
+<li>“tcga.gdc_cases.diagnoses.primary_diagnosis”</li>
+<li>“tcga.gdc_cases.diagnoses.tumor_stage”</li>
+<li>“tcga.gdc_cases.diagnoses.age_at_diagnosis”</li>
+<li>“tcga.cgc_case_age_at_diagnosis”</li>
+<li>“tcga.xml_histological_type”<br />
+</li>
+<li>“tcga.xml_distant_metastasis_present_ind2”</li>
+</ul>
+<p>We can check each one to see what kind of information they contain, and select the most useful ones.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="building-a-statistical-model.html#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Essentially empty, either not reported or NA</span></span>
+<span id="cb32-2"><a href="building-a-statistical-model.html#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(rse_BRCA<span class="sc">$</span>tcga.gdc_cases.diagnoses.classification_of_tumor)</span></code></pre></div>
+<pre><code>## 
+## not reported 
+##         1246</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="building-a-statistical-model.html#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Not very useful, as most samples have the same value </span></span>
+<span id="cb34-2"><a href="building-a-statistical-model.html#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co"># c50.9 = Malignant neoplasm: Breast, unspecified</span></span>
+<span id="cb34-3"><a href="building-a-statistical-model.html#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(rse_BRCA<span class="sc">$</span>tcga.gdc_cases.diagnoses.primary_diagnosis)</span></code></pre></div>
+<pre><code>## 
+##   c50.2   c50.3   c50.4   c50.5   c50.8   c50.9 c50.919 
+##       2       6       5       1       3    1228       1</code></pre>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="building-a-statistical-model.html#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Useful information, it appears most samples have it and we have different levels </span></span>
+<span id="cb36-2"><a href="building-a-statistical-model.html#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(rse_BRCA<span class="sc">$</span>tcga.gdc_cases.diagnoses.tumor_stage)</span></code></pre></div>
+<pre><code>## 
+## not reported      stage i     stage ia     stage ib     stage ii    stage iia    stage iib    stage iii   stage iiia 
+##           12          106           96            6            6          408          299            2          174 
+##   stage iiib   stage iiic     stage iv      stage x 
+##           31           71           22           13</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="building-a-statistical-model.html#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Two very similar columns </span></span>
+<span id="cb38-2"><a href="building-a-statistical-model.html#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># It appears the first is in days, the second in years, we will use the second one</span></span>
+<span id="cb38-3"><a href="building-a-statistical-model.html#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rse_BRCA<span class="sc">$</span>tcga.gdc_cases.diagnoses.age_at_diagnosis)</span></code></pre></div>
+<pre><code>## [1] 16689 24544 17420 25186 27934 25263</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="building-a-statistical-model.html#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rse_BRCA<span class="sc">$</span>tcga.cgc_case_age_at_diagnosis)</span></code></pre></div>
+<pre><code>## [1] 45 67 47 68 76 69</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="building-a-statistical-model.html#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Different categories, it appears all samples have data </span></span>
+<span id="cb42-2"><a href="building-a-statistical-model.html#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(rse_BRCA<span class="sc">$</span>tcga.xml_histological_type)</span></code></pre></div>
+<pre><code>## 
+##       Infiltrating Carcinoma NOS    Infiltrating Ductal Carcinoma   Infiltrating Lobular Carcinoma 
+##                                1                              896                              219 
+##              Medullary Carcinoma            Metaplastic Carcinoma Mixed Histology (please specify) 
+##                                8                               13                               39 
+##               Mucinous Carcinoma                   Other, specify 
+##                               18                               51</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="building-a-statistical-model.html#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Useful information, but not all samples have data </span></span>
+<span id="cb44-2"><a href="building-a-statistical-model.html#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(rse_BRCA<span class="sc">$</span>tcga.xml_distant_metastasis_present_ind2)</span></code></pre></div>
+<pre><code>## 
+##  NO YES 
+## 466  17</code></pre>
+<p>From this, we select “tcga.gdc_cases.diagnoses.tumor_stage” and “tcga.cgc_case_age_at_diagnosis”. For this particular analysis, instead of using the histological type, we are interested in the <a href="https://doi.org/10.1038/nature11412">PAM50 subtype</a>, which we will add to the data later. For the tumor stage, we will reduce the number of levels by ignoring the sub-stage, as well as stage X (undetermined stage), keeping only stage I, stage II, stage III and stage IV.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="building-a-statistical-model.html#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove a, b, c termination, store in new col </span></span>
+<span id="cb46-2"><a href="building-a-statistical-model.html#cb46-2" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>tumor_stage <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&#39;[abc]$&#39;</span>, <span class="st">&#39;&#39;</span>, rse_BRCA<span class="sc">$</span>tcga.gdc_cases.diagnoses.tumor_stage)</span>
+<span id="cb46-3"><a href="building-a-statistical-model.html#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="building-a-statistical-model.html#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace stage x  and not reported with NA </span></span>
+<span id="cb46-5"><a href="building-a-statistical-model.html#cb46-5" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>tumor_stage <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&#39;stage x|not reported&#39;</span>, <span class="cn">NA</span>, rse_BRCA<span class="sc">$</span>tumor_stage)</span>
+<span id="cb46-6"><a href="building-a-statistical-model.html#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="building-a-statistical-model.html#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Store data as numbers, as stage I is least advanced, stage IV most advanced</span></span>
+<span id="cb46-8"><a href="building-a-statistical-model.html#cb46-8" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>tumor_stage <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&#39;stage iv&#39;</span>, <span class="dv">4</span>, rse_BRCA<span class="sc">$</span>tumor_stage)</span>
+<span id="cb46-9"><a href="building-a-statistical-model.html#cb46-9" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>tumor_stage <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&#39;stage iii&#39;</span>, <span class="dv">3</span>, rse_BRCA<span class="sc">$</span>tumor_stage)</span>
+<span id="cb46-10"><a href="building-a-statistical-model.html#cb46-10" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>tumor_stage <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&#39;stage ii&#39;</span>, <span class="dv">2</span>, rse_BRCA<span class="sc">$</span>tumor_stage)</span>
+<span id="cb46-11"><a href="building-a-statistical-model.html#cb46-11" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>tumor_stage <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&#39;stage i&#39;</span>, <span class="dv">1</span>, rse_BRCA<span class="sc">$</span>tumor_stage)</span>
+<span id="cb46-12"><a href="building-a-statistical-model.html#cb46-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-13"><a href="building-a-statistical-model.html#cb46-13" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(rse_BRCA<span class="sc">$</span>tumor_stage)</span></code></pre></div>
+<pre><code>## 
+##   1   2   3   4 
+## 208 713 278  22</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="building-a-statistical-model.html#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Store age in new column for easier selection</span></span>
+<span id="cb48-2"><a href="building-a-statistical-model.html#cb48-2" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>age <span class="ot">&lt;-</span> rse_BRCA<span class="sc">$</span>tcga.cgc_case_age_at_diagnosis</span></code></pre></div>
+<p>To obtain the PAM50 subtypes, we will need the package <a href="http://bioconductor.org/packages/release/bioc/html/TCGAbiolinks.html"><code>TCGAbiolinks</code></a>. The function <code>TCGAquery_subtype</code> allows us to retrieve molecular subtype data. The documentation can be found <a href="https://www.bioconductor.org/packages/devel/bioc/vignettes/TCGAbiolinks/inst/doc/subtypes.html#TCGAquery_subtype:_Working_with_molecular_subtypes_data">here</a>.</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="building-a-statistical-model.html#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;TCGAbiolinks&quot;</span>)</span>
+<span id="cb49-2"><a href="building-a-statistical-model.html#cb49-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-3"><a href="building-a-statistical-model.html#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="co"># We will store patient and subtype</span></span>
+<span id="cb49-4"><a href="building-a-statistical-model.html#cb49-4" aria-hidden="true" tabindex="-1"></a>subtypes <span class="ot">&lt;-</span> <span class="fu">TCGAquery_subtype</span>(<span class="at">tumor =</span> <span class="st">&quot;brca&quot;</span>)[, <span class="fu">c</span>(<span class="st">&quot;patient&quot;</span>, <span class="st">&quot;BRCA_Subtype_PAM50&quot;</span>)]</span></code></pre></div>
+<pre><code>## brca subtype information from:doi.org/10.1016/j.ccell.2018.03.014</code></pre>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="building-a-statistical-model.html#cb51-1" aria-hidden="true" tabindex="-1"></a>subtypes <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(subtypes)</span>
+<span id="cb51-2"><a href="building-a-statistical-model.html#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-3"><a href="building-a-statistical-model.html#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(subtypes)</span></code></pre></div>
+<pre><code>## [1] 1087</code></pre>
+<p>We have information for 1087 of the 1256 samples. Now, we need to match this information to our table.</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="building-a-statistical-model.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(subtypes<span class="sc">$</span>patient)</span></code></pre></div>
+<pre><code>## [1] &quot;TCGA-3C-AAAU&quot; &quot;TCGA-3C-AALI&quot; &quot;TCGA-3C-AALJ&quot; &quot;TCGA-3C-AALK&quot; &quot;TCGA-4H-AAAK&quot; &quot;TCGA-5L-AAT0&quot;</code></pre>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="building-a-statistical-model.html#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rse_BRCA<span class="sc">$</span>tcga.tcga_barcode)</span></code></pre></div>
+<pre><code>## [1] &quot;TCGA-E9-A249-01A-11R-A169-07&quot; &quot;TCGA-BH-A1EX-01A-11R-A13Q-07&quot; &quot;TCGA-AO-A12A-01A-21R-A115-07&quot;
+## [4] &quot;TCGA-AC-A3OD-01B-06R-A22O-07&quot; &quot;TCGA-AC-A23G-01A-11R-A213-07&quot; &quot;TCGA-A8-A07I-01A-11R-A00Z-07&quot;</code></pre>
+<p>We will take the first 12 characters of the <code>tcga_barcode</code> and use them to match the subtype. TCGA barcodes contain data about each sample, as explained <a href="https://docs.gdc.cancer.gov/Encyclopedia/pages/TCGA_Barcode/">here</a>.</p>
+<p><img src="https://docs.gdc.cancer.gov/Encyclopedia/pages/images/barcode.png"></p>
+<p>The digits following the initial 12 detail whether a sample comes from a tumor or from normal tissue. There are no duplicates for patient in the <code>subtypes</code> table we obtained, so this will only matter if there are both normal and tumor samples for the same patient in our <code>rse_BRCA</code> object, in which case, both will get marked as the type of tumor.</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="building-a-statistical-model.html#cb57-1" aria-hidden="true" tabindex="-1"></a>barcode_trimmed <span class="ot">&lt;-</span> <span class="fu">sapply</span>(rse_BRCA<span class="sc">$</span>tcga.tcga_barcode, substr, <span class="dv">1</span>,<span class="dv">12</span>, <span class="at">USE.NAMES =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb57-2"><a href="building-a-statistical-model.html#cb57-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-3"><a href="building-a-statistical-model.html#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Add as new column</span></span>
+<span id="cb57-4"><a href="building-a-statistical-model.html#cb57-4" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>subtype <span class="ot">&lt;-</span> subtypes<span class="sc">$</span>BRCA_Subtype_PAM50[<span class="fu">match</span>(barcode_trimmed, subtypes<span class="sc">$</span>patient)]</span>
+<span id="cb57-5"><a href="building-a-statistical-model.html#cb57-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-6"><a href="building-a-statistical-model.html#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix normal samples mismatched </span></span>
+<span id="cb57-7"><a href="building-a-statistical-model.html#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Normal samples have the 14th digit of tcga_barcode = 1</span></span>
+<span id="cb57-8"><a href="building-a-statistical-model.html#cb57-8" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>subtype[<span class="fu">substr</span>(rse_BRCA<span class="sc">$</span>tcga.tcga_barcode, <span class="dv">14</span>, <span class="dv">14</span>) <span class="sc">==</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="st">&quot;Normal&quot;</span></span>
+<span id="cb57-9"><a href="building-a-statistical-model.html#cb57-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-10"><a href="building-a-statistical-model.html#cb57-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Tumor samples have 14th digit = 0, if one is &quot;Normal&quot;, something went wrong, we can ignore those samples </span></span>
+<span id="cb57-11"><a href="building-a-statistical-model.html#cb57-11" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>subtype[(<span class="fu">substr</span>(rse_BRCA<span class="sc">$</span>tcga.tcga_barcode, <span class="dv">14</span>, <span class="dv">14</span>) <span class="sc">==</span> <span class="dv">0</span>)<span class="sc">&amp;</span>(rse_BRCA<span class="sc">$</span>subtype <span class="sc">==</span> <span class="st">&quot;Normal&quot;</span>)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code></pre></div>
+<p>Now, we will make a statistical model based on these attributes. Before that, we process our desired data one more time, ensuring data types are correct and no NA values remain.</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="building-a-statistical-model.html#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Change type of columns of interest, numeric or factor </span></span>
+<span id="cb58-2"><a href="building-a-statistical-model.html#cb58-2" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>subtype <span class="ot">&lt;-</span> <span class="fu">factor</span>(rse_BRCA<span class="sc">$</span>subtype)</span>
+<span id="cb58-3"><a href="building-a-statistical-model.html#cb58-3" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>age <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(rse_BRCA<span class="sc">$</span>age)</span>
+<span id="cb58-4"><a href="building-a-statistical-model.html#cb58-4" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>tumor_stage <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(rse_BRCA<span class="sc">$</span>tumor_stage)</span>
+<span id="cb58-5"><a href="building-a-statistical-model.html#cb58-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-6"><a href="building-a-statistical-model.html#cb58-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Samples</span></span>
+<span id="cb58-7"><a href="building-a-statistical-model.html#cb58-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(rse_BRCA)</span></code></pre></div>
+<pre><code>## [1] 1256</code></pre>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="building-a-statistical-model.html#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Only keep samples with no NA values in desired cols </span></span>
+<span id="cb60-2"><a href="building-a-statistical-model.html#cb60-2" aria-hidden="true" tabindex="-1"></a>rse_BRCA <span class="ot">&lt;-</span> rse_BRCA[,<span class="fu">rowSums</span>(<span class="fu">is.na</span>(<span class="fu">colData</span>(rse_BRCA)[<span class="fu">c</span>(<span class="st">&#39;subtype&#39;</span>, <span class="st">&#39;age&#39;</span>, <span class="st">&#39;tumor_stage&#39;</span>)])) <span class="sc">==</span> <span class="dv">0</span>]</span>
+<span id="cb60-3"><a href="building-a-statistical-model.html#cb60-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="building-a-statistical-model.html#cb60-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(rse_BRCA)</span></code></pre></div>
+<pre><code>## [1] 1159</code></pre>
+<p>We are left with 1159 samples. We can obtain a summary of the data:</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="building-a-statistical-model.html#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">as.data.frame</span>(<span class="fu">colData</span>(rse_BRCA)[<span class="fu">c</span>(<span class="st">&#39;subtype&#39;</span>, <span class="st">&#39;age&#39;</span>, <span class="st">&#39;tumor_stage&#39;</span>)]))</span></code></pre></div>
+<pre><code>##    subtype         age         tumor_stage  
+##  Basal :203   Min.   :26.00   Min.   :1.00  
+##  Her2  : 79   1st Qu.:48.00   1st Qu.:2.00  
+##  LumA  :558   Median :58.00   Median :2.00  
+##  LumB  :208   Mean   :58.43   Mean   :2.09  
+##  Normal:111   3rd Qu.:67.50   3rd Qu.:2.00  
+##               Max.   :90.00   Max.   :4.00</code></pre>
+</div>
+<div id="normalizing-data" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Normalizing data</h2>
+<p>We will use the package <a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25#Sec2"><code>edgeR</code></a> to normalize the data, correcting for <em>composition bias</em>.</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="building-a-statistical-model.html#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;edgeR&quot;</span>) </span>
+<span id="cb64-2"><a href="building-a-statistical-model.html#cb64-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-3"><a href="building-a-statistical-model.html#cb64-3" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> <span class="fu">DGEList</span>(</span>
+<span id="cb64-4"><a href="building-a-statistical-model.html#cb64-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">counts =</span> <span class="fu">assay</span>(rse_BRCA, <span class="st">&quot;counts&quot;</span>),</span>
+<span id="cb64-5"><a href="building-a-statistical-model.html#cb64-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">genes =</span> <span class="fu">rowData</span>(rse_BRCA)</span>
+<span id="cb64-6"><a href="building-a-statistical-model.html#cb64-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb64-7"><a href="building-a-statistical-model.html#cb64-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-8"><a href="building-a-statistical-model.html#cb64-8" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> <span class="fu">calcNormFactors</span>(dge)</span></code></pre></div>
+</div>
+<div id="exploring-relationships-between-variables" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Exploring relationships between variables</h2>
+<p>Considering our three variables, we can explore the relationships between them before proceeding with the model.</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="building-a-statistical-model.html#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting </span></span>
+<span id="cb65-2"><a href="building-a-statistical-model.html#cb65-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb65-3"><a href="building-a-statistical-model.html#cb65-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-4"><a href="building-a-statistical-model.html#cb65-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Age vs subtype</span></span>
+<span id="cb65-5"><a href="building-a-statistical-model.html#cb65-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">as.data.frame</span>(<span class="fu">colData</span>(rse_BRCA)), <span class="fu">aes</span>(<span class="at">y =</span> age, <span class="at">x =</span> subtype)) <span class="sc">+</span></span>
+<span id="cb65-6"><a href="building-a-statistical-model.html#cb65-6" aria-hidden="true" tabindex="-1"></a>     <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb65-7"><a href="building-a-statistical-model.html#cb65-7" aria-hidden="true" tabindex="-1"></a>     <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">20</span>) <span class="sc">+</span></span>
+<span id="cb65-8"><a href="building-a-statistical-model.html#cb65-8" aria-hidden="true" tabindex="-1"></a>     <span class="fu">ylab</span>(<span class="st">&quot;Age&quot;</span>) <span class="sc">+</span></span>
+<span id="cb65-9"><a href="building-a-statistical-model.html#cb65-9" aria-hidden="true" tabindex="-1"></a>     <span class="fu">xlab</span>(<span class="st">&quot;Subtype&quot;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p>There are only slight differences between the age at diagnosis and the subtype.</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="building-a-statistical-model.html#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stage vs subtype </span></span>
+<span id="cb66-2"><a href="building-a-statistical-model.html#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="fu">colData</span>(rse_BRCA)[<span class="fu">c</span>(<span class="st">&#39;subtype&#39;</span>, <span class="st">&#39;tumor_stage&#39;</span>)])</span></code></pre></div>
+<pre><code>##         tumor_stage
+## subtype    1   2   3   4
+##   Basal   29 144  27   3
+##   Her2     7  49  20   3
+##   LumA   117 305 128   8
+##   LumB    25 118  61   4
+##   Normal  19  65  25   2</code></pre>
+<p>Stage II is the most common. For these plots, we have to keep in mind that normal samples are paired with cancer samples, the stage and age of diagnosis corresponds to the tumor associated.</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="building-a-statistical-model.html#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stage vs age</span></span>
+<span id="cb68-2"><a href="building-a-statistical-model.html#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">as.data.frame</span>(<span class="fu">colData</span>(rse_BRCA)), <span class="fu">aes</span>(<span class="at">y =</span> age, <span class="at">x =</span> <span class="fu">factor</span>(tumor_stage))) <span class="sc">+</span></span>
+<span id="cb68-3"><a href="building-a-statistical-model.html#cb68-3" aria-hidden="true" tabindex="-1"></a>           <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb68-4"><a href="building-a-statistical-model.html#cb68-4" aria-hidden="true" tabindex="-1"></a>           <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">20</span>) <span class="sc">+</span></span>
+<span id="cb68-5"><a href="building-a-statistical-model.html#cb68-5" aria-hidden="true" tabindex="-1"></a>           <span class="fu">ylab</span>(<span class="st">&quot;Age&quot;</span>) <span class="sc">+</span></span>
+<span id="cb68-6"><a href="building-a-statistical-model.html#cb68-6" aria-hidden="true" tabindex="-1"></a>           <span class="fu">xlab</span>(<span class="st">&quot;Tumor Stage&quot;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<p>From these plots, it appears that age is not correlated with a particular subtype or stage: the distribution of age is similar across all four stages and all subtypes.</p>
+<p>We will proceed with the following statistical model:</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="building-a-statistical-model.html#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Change reference so Normal is the intercept in the model</span></span>
+<span id="cb69-2"><a href="building-a-statistical-model.html#cb69-2" aria-hidden="true" tabindex="-1"></a>rse_BRCA<span class="sc">$</span>subtype <span class="ot">&lt;-</span> <span class="fu">relevel</span>(rse_BRCA<span class="sc">$</span>subtype, <span class="st">&quot;Normal&quot;</span>)</span>
+<span id="cb69-3"><a href="building-a-statistical-model.html#cb69-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb69-4"><a href="building-a-statistical-model.html#cb69-4" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> age <span class="sc">+</span> subtype <span class="sc">+</span> tumor_stage,</span>
+<span id="cb69-5"><a href="building-a-statistical-model.html#cb69-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">colData</span>(rse_BRCA)</span>
+<span id="cb69-6"><a href="building-a-statistical-model.html#cb69-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb69-7"><a href="building-a-statistical-model.html#cb69-7" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(mod)</span></code></pre></div>
+<pre><code>## [1] &quot;(Intercept)&quot;  &quot;age&quot;          &quot;subtypeBasal&quot; &quot;subtypeHer2&quot;  &quot;subtypeLumA&quot;  &quot;subtypeLumB&quot;  &quot;tumor_stage&quot;</code></pre>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="downloading-data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="differential-expression-analysis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
