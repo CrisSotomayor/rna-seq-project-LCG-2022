@@ -20,36 +20,7 @@ In this project, we will use the [`recount3`](http://rna.recount.bio) R package 
 
 ## Requirements {-}
 
-Install R 4.1.x from [CRAN](https://cran.r-project.org/) then install the following R packages:
-
-```{r install, eval = FALSE}
-## For installing Bioconductor packages
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
-    install.packages("BiocManager")
-}
-## Install required packages
-BiocManager::install(
-    c(
-        "usethis", ## Utilities
-        "here",
-        "biocthis",
-        "lobstr",
-        "sessioninfo",
-        "SummarizedExperiment", ## Main containers / vis
-        "iSEE",
-        "edgeR", ## RNA-seq
-        "limma",
-        "recount3",
-        "pheatmap", ## Visualization
-        "ggplot2",
-        "patchwork",
-        "RColorBrewer", 
-        "TCGAbiolinks"
-    )
-)
-```
-
-
+We will need R 4.1.x, which can be installed from [CRAN](https://cran.r-project.org/), and the following packages.
 
 ```{r session_packages, eval = TRUE, message = FALSE}
 library("sessioninfo")
